@@ -26,6 +26,7 @@ class XferServer():
         print(f"[+] {address} is connected.")
         received = client_socket.recv(self.buffer_size).decode()  # Receive file over socket.
         filename, filesize = received.split(self.separator)  # Split out filename and filesize.
+        # TODO: Set an explict path to write file to.
         filename = os.path.basename(filename)  # Pass our filename and path to the writer.
         filesize = int(filesize)  # Pass our filesize to the writer.
 
