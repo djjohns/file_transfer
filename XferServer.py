@@ -4,8 +4,27 @@ import os
 
 
 class XferServer():
-    '''Spins up a simple socket server to transfer files.
-    Expects host as "0.0.0.0", port 5001 as int, buffer_size 4096 as int, and separator as "<SEPARATOR>" '''
+    '''
+    ### Spins up a simple socket server to transfer files.
+    #### Args
+    host (str): IP address of the server or FQDN. In development use "0.0.0.0".
+    
+    port (int): This is the port number that is open on the server. In our case for development it is port 5001.
+    
+    buffer_size (int): The reserved segment of memory allocated for transfer progress. This value should be the same on both server and client. Currently this is set to 4096.
+    
+    separator (str): This is what indicates the seperation between the information we send over the socket to the server. Currently this is set to "<SEPARATOR>".
+    #### Implementation example
+    ```
+    from file_transfer import XferServer
+    
+    host = "0.0.0.0"
+    port = 5001
+    buffer_size = 4096
+    separator = "<SEPARATOR>"
+    XferServer(host, port, buffer_size, separator)
+    ```
+    '''
     def __init__(self, host, port, buffer_size, separator,):
         self.host = host
         self.port = port
@@ -14,7 +33,8 @@ class XferServer():
 
         # TODO: Error handling with some try excepts.
         # TODO: Handle graceful termination w/ keyboard inturupts.
-        # TODO: Uncompress file before sending.
+        # TODO: Only accept requests from clients with specific ip addresses.
+        # TODO: Un-compress file before sending.
         # TODO: Dencrypt file before sending.
         # TODO: Hashing an checksums of the files client and server.
         s = socket.socket()  # Create our socket.
@@ -49,6 +69,6 @@ class XferServer():
 if __name__ == '__main__':
     host = '0.0.0.0'
     port = 5001
-    buffer_size =4096
+    buffer_size = 4096
     separator = "<SEPARATOR>"
     XferServer(host, port, buffer_size, separator)

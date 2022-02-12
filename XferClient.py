@@ -4,7 +4,27 @@ import os
 
 
 class XferClient():
-    '''Simple file transfer over a socket client. Expects host as str IPadd "127.0.0.1",  port 5001 as int, buffer_size 4096 as int, and separator as str "<SEPARATOR>" '''
+    '''
+    ### Simple file transfer client over a socket.
+    #### Args
+    host (str): IP address of the server or FQDN. In development use "127.0.0.1".
+    
+    port (int): This is the port number that is open on the server. In our case for development it is port 5001.
+    
+    buffer_size (int): The reserved segment of memory allocated for transfer progress. This value should be the same on both server and client. Currently this is set to 4096.
+    
+    separator (str): This is what indicates the seperation between the information we send over the socket to the server. Currently this is set to "<SEPARATOR>".
+    #### Implementation example
+    ```
+    from file_transfer import XferClient
+    
+    host = "127.0.0.1"
+    port = 5001
+    buffer_size = 4096
+    separator = "<SEPARATOR>"
+    XferClient(host, port, buffer_size, separator)
+    ``` 
+    '''
     def __init__(self, host, port, buffer_size, separator):
         self.host = host
         self.port = port
@@ -23,7 +43,7 @@ class XferClient():
         filename = input("File to Transfer : ")  # Add full path of file to send.
         # TODO: Handle for windows paths. Or set to a static path.
         filesize = os.path.getsize(filename)  # Get size of file in bytes.
-        s.send(f"{filename}{self.separator}{filesize}".encode()) # Send file over socket.
+        s.send(f"{filename}{self.separator}{filesize}".encode()) # Send file, separator,and filesize over socket.
 
         # Fancy progess bar.
         progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
