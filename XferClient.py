@@ -30,35 +30,41 @@ class XferClient():
         self.port = port
         self.buffer_size = buffer_size
         self.separator = separator
-        
-        # TODO: Error handling with some try excepts.
         # TODO: Handle graceful termination w/ keyboard inturupts.
         # TODO: Compress file before sending.
         # TODO: Encrypt file before sending.
         # TODO: Hashing an checksums of the files client and server.
-        s = socket.socket()
-        print(f"[+] Connecting to {self.host}:{self.port}")
-        s.connect((self.host, self.port))  # Make socket conn to host:port.
-        print("[+] Connected to ", host)
-        filename = input("File to Transfer : ")  # Add full path of file to send.
-        # TODO: Handle for windows paths. Or set to a static path.
-        filesize = os.path.getsize(filename)  # Get size of file in bytes.
-        s.send(f"{filename}{self.separator}{filesize}".encode()) # Send file, separator,and filesize over socket.
+        try:
+            # Filepath to the dir we place all of our files to transfer.
+            src_dir = os.path.realpath('C:/dev/FilesToTransfer')
+            try:
+                for filename in os.listdir(src_dir):
+                    s = socket.socket()
+                    print(f"[+] Attpeting connection to: {self.host}:{self.port}")
+                    s.connect((self.host, self.port))  # Make socket conn to host:port.
+                    print(f"[+] Connection established to: {self.host}:{self.port}")
+                    filesize = os.path.getsize(os.path.join(src_dir,filename))  # Get size of file in bytes
+                    s.send(f"{filename}{self.separator}{filesize}".encode()) # Send file, separator,and filesize over socket.
+                    # Read our file into the socket as bytes and update progess bar.
+                    progress = tqdm.tqdm(range(filesize), f"[+] Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
+                    with open(os.path.join(src_dir,filename), "rb") as fh:
+                        while True:
+                            bytes_read = fh.read(self.buffer_size)
+                            if not bytes_read:
+                                break
+                            s.sendall(bytes_read)
+                            progress.update(len(bytes_read))
+                s.close()  # Remember to close the socket.
+            except Exception as e:
+                s.close()  # Close the socket if we throw an exception.
+                print(e)
+            s.close()  # Remember to close the socket.
+        except Exception as e:
+            print(e)
 
-        # Fancy progess bar.
-        progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
-        # Read our file into the socket as bytes and update progess bar.
-        # As well as closing the client socket.
-        with open(filename, "rb") as f:
-            while True:
-                bytes_read = f.read(self.buffer_size)
-                if not bytes_read:
-                    break
-                s.sendall(bytes_read)
-                progress.update(len(bytes_read))
-        s.close()
-        
-        
+
+
+
 if __name__ == "__main__":
     host = "127.0.0.1"
     port = 5001
